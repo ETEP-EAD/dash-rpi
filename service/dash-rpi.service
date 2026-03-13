@@ -1,0 +1,16 @@
+[Unit]
+Description=Dash RPi Display Client
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/dash-rpi
+EnvironmentFile=-/etc/dash-rpi/env
+ExecStart=/usr/local/bin/dash-rpi-start.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
