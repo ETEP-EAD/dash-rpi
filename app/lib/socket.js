@@ -1,5 +1,7 @@
 import { io } from "socket.io-client";
+
 import { getSerialNumber } from "./utils.js";
+import { renderImageToFramebuffer } from "./lib/fb-renderer.js";
 
 const DEVICE_ID = getSerialNumber();
 
@@ -30,7 +32,16 @@ export function initSocket() {
   });
 
   socket.on("show", (data) => {
-    console.log("🔔 Show event received:", data);
+    console.log("🖼️ imagem recebida");
+
+    const buffer = Buffer.from(data.image, "base64");
+
+    const filePath = "/tmp/screen.png";
+
+    fs.writeFileSync(filePath, buffer);
+
+    // 👇 aqui depende do seu setup de display
+    renderImageToFramebuffer(filePath);
   });
 
   return socket;
