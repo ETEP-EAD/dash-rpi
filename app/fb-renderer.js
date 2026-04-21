@@ -51,6 +51,7 @@ async function renderImageToFramebuffer(imagePath) {
 
   const rgba = await sharp(imagePath)
     .resize(width, height, { fit: "cover" })
+    .ensureAlpha()
     .raw()
     .toBuffer();
 
