@@ -66,6 +66,12 @@ async function renderImageToFramebuffer(imagePath) {
     throw new Error(`Formato não suportado: ${bpp} bpp`);
   }
 
+  await renderBufferToFramebuffer(finalBuffer);
+}
+
+async function renderBufferToFramebuffer(buffer) {
+  const { width, height, bpp, stride } = getFbInfo();
+
   const bytesPerPixel = bpp / 8;
 
   const fb = fs.openSync(FB_PATH, "w");
@@ -74,7 +80,7 @@ async function renderImageToFramebuffer(imagePath) {
     const srcStart = y * width * bytesPerPixel;
     const srcEnd = srcStart + width * bytesPerPixel;
 
-    const line = finalBuffer.subarray(srcStart, srcEnd);
+    const line = buffer.subarray(srcStart, srcEnd);
 
     fs.writeSync(fb, line, 0, line.length, y * stride);
   }
@@ -82,4 +88,4 @@ async function renderImageToFramebuffer(imagePath) {
   fs.closeSync(fb);
 }
 
-export { renderImageToFramebuffer };
+export { renderImageToFramebuffer, renderBufferToFramebuffer, getFbInfo };

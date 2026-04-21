@@ -2,7 +2,7 @@ import { io } from "socket.io-client";
 import fs from "fs";
 
 import { getSerialNumber } from "./utils.js";
-import { renderImageToFramebuffer } from "./fb-renderer.js";
+import { getFbInfo, renderImageToFramebuffer, renderBufferToFramebuffer } from "./fb-renderer.js";
 
 const DEVICE_ID = getSerialNumber();
 
@@ -16,11 +16,13 @@ export function initSocket() {
 
   socket.on("connect", () => {
     console.log("🔌 Conectado ao backend");
+    const { width, height, bpp, stride } = getFbInfo();
 
     // handshake manual com deviceId
     socket.emit("register_device", {
       deviceId: DEVICE_ID,
-      platform: "raspberry-pi"
+      platform: "raspberry-pi",
+      screen: { width, height, bpp, stride }
     });
   });
 
@@ -43,6 +45,14 @@ export function initSocket() {
 
     // 👇 aqui depende do seu setup de display
     renderImageToFramebuffer(filePath);
+  });
+
+  socket.on("show_buffer", async (data) => {
+    console.log("🖼️ buffer recebido");
+
+    const buffer = Buffer.from(data.image, "base64");
+
+    await renderBufferToFramebuffer(buffer);
   });
 
   return socket;
