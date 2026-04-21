@@ -1,4 +1,5 @@
 import { io } from "socket.io-client";
+import fs from "fs";
 
 import { getSerialNumber } from "./utils.js";
 import { renderImageToFramebuffer } from "./fb-renderer.js";
