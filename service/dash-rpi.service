@@ -6,17 +6,8 @@ After=network-online.target
 Type=simple
 User=root
 WorkingDirectory=/opt/dash-rpi
-
-# ESSENCIAL
-StandardInput=tty
-StandardOutput=tty
-TTYPath=/dev/tty1
-TTYReset=yes
-TTYVHangup=yes
-
-ExecStartPre=/bin/chvt 1
+EnvironmentFile=-/etc/dash-rpi/env
 ExecStart=/usr/local/bin/dash-rpi-start.sh
-
 Restart=always
 RestartSec=5
 
