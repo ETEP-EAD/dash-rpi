@@ -23,8 +23,7 @@ function getFbInfo() {
   return { width, height, bpp, stride };
 }
 
-// converte RGBA → RGB565
-function rgbaToBgr565(buffer) {
+function rgbaToRgb565(buffer) {
   const out = Buffer.alloc((buffer.length / 4) * 2);
 
   for (let i = 0, j = 0; i < buffer.length; i += 4, j += 2) {
@@ -33,9 +32,9 @@ function rgbaToBgr565(buffer) {
     const b = buffer[i + 2];
 
     const value =
-      ((b >> 3) << 11) |   // BLUE no lugar do RED
+      ((r >> 3) << 11) |
       ((g >> 2) << 5)  |
-      (r >> 3);            // RED no lugar do BLUE
+      (b >> 3);
 
     out[j] = value & 0xff;
     out[j + 1] = value >> 8;
@@ -58,8 +57,8 @@ async function renderImageToFramebuffer(imagePath) {
   let finalBuffer;
 
   if (bpp === 16) {
-    console.log("Convertendo para BGR565...");
-    finalBuffer = rgbaToBgr565(rgba);
+    console.log("Convertendo para RGB565...");
+    finalBuffer = rgbaToRgb565(rgba);
   } else if (bpp === 32) {
     console.log("Usando RGBA direto...");
     finalBuffer = rgba;
