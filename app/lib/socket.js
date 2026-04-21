@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 
 import { getSerialNumber } from "./utils.js";
-import { renderImageToFramebuffer } from "./lib/fb-renderer.js";
+import { renderImageToFramebuffer } from "./fb-renderer.js";
 
 const DEVICE_ID = getSerialNumber();
 
