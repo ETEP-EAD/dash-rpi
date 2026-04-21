@@ -1,5 +1,5 @@
 import { renderImageToFramebuffer } from "./lib/fb-renderer.js";
-import { initSocket } from "./socket.js";
+import { initSocket } from "./lib/socket.js";
 
 async function main() {
   const imagePath = "/opt/dash-rpi/images/test.jpg";
