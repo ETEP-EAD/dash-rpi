@@ -14,7 +14,8 @@ fi
 BRANCH="$(git -C "$REPO_DIR" rev-parse --abbrev-ref HEAD)"
 
 echo "[1/7] Atualizando repositório local..."
-git -C "$REPO_DIR" pull --ff-only origin "$BRANCH"
+git -C "$REPO_DIR" fetch origin
+git -C "$REPO_DIR" reset --hard "origin/$BRANCH"
 
 echo "[2/7] Sincronizando arquivos para $APP_DIR ..."
 sudo rsync -a --delete \
