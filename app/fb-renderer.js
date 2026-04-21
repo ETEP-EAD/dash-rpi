@@ -5,47 +5,76 @@ import { execSync } from "node:child_process";
 const FB_PATH = "/dev/fb0";
 
 function getFbInfo() {
-  const output = execSync("fbset -fb /dev/fb0 -s").toString();
+  const output = execSync("fbset -s").toString();
 
-  const geo = output.match(/geometry\s+(\d+)\s+(\d+)\s+\d+\s+\d+\s+(\d+)/);
-  const line = output.match(/rgba\s+\d+\/\d+,\d+\/\d+,\d+\/\d+,\d+\/\d+/);
+  const match = output.match(/geometry\s+(\d+)\s+(\d+)\s+\d+\s+\d+\s+(\d+)/);
 
-  if (!geo) throw new Error("Erro lendo framebuffer");
+  if (!match) throw new Error("Erro lendo framebuffer");
 
-  const width = parseInt(geo[1], 10);
-  const height = parseInt(geo[2], 10);
-  const bpp = parseInt(geo[3], 10);
+  const width = parseInt(match[1], 10);
+  const height = parseInt(match[2], 10);
+  const bpp = parseInt(match[3], 10);
 
-  const bytesPerPixel = bpp / 8;
-
-  // pegar stride via fbset não é confiável → calcular depois
-  const stride = width * bytesPerPixel;
-
-  return { width, height, bytesPerPixel, stride };
+  return { width, height, bpp };
 }
 
-export async function renderImageToFramebuffer(imagePath) {
-  const { width, height, bytesPerPixel, stride } = getFbInfo();
+// converte RGBA → RGB565
+function rgbaToBgr565(buffer) {
+  const out = Buffer.alloc((buffer.length / 4) * 2);
 
-  console.log({ width, height, bytesPerPixel, stride });
+  for (let i = 0, j = 0; i < buffer.length; i += 4, j += 2) {
+    const r = buffer[i];
+    const g = buffer[i + 1];
+    const b = buffer[i + 2];
 
-  const raw = await sharp(imagePath)
+    const value =
+      ((b >> 3) << 11) |   // BLUE no lugar do RED
+      ((g >> 2) << 5)  |
+      (r >> 3);            // RED no lugar do BLUE
+
+    out[j] = value & 0xff;
+    out[j + 1] = value >> 8;
+  }
+
+  return out;
+}
+
+async function renderImageToFramebuffer(imagePath) {
+  const { width, height, bpp } = getFbInfo();
+
+  console.log(`Framebuffer: ${width}x${height} (${bpp}bpp)`);
+
+  const rgba = await sharp(imagePath)
     .resize(width, height, { fit: "cover" })
     .raw()
     .toBuffer();
 
+  let finalBuffer;
+
+  if (bpp === 16) {
+    console.log("Convertendo para BGR565...");
+    finalBuffer = rgbaToBgr565(rgba);
+  } else if (bpp === 32) {
+    console.log("Usando RGBA direto...");
+    finalBuffer = rgba;
+  } else {
+    throw new Error(`Formato não suportado: ${bpp} bpp`);
+  }
+
+  const stride = width * 2; // 2 bytes por pixel
+
   const fb = fs.openSync(FB_PATH, "w");
 
   for (let y = 0; y < height; y++) {
-    const srcStart = y * width * bytesPerPixel;
-    const srcEnd = srcStart + width * bytesPerPixel;
+    const start = y * width * 2;
+    const end = start + width * 2;
 
-    const line = raw.subarray(srcStart, srcEnd);
+    const line = finalBuffer.subarray(start, end);
 
     fs.writeSync(fb, line, 0, line.length, y * stride);
   }
 
   fs.closeSync(fb);
-
-  console.log("Render OK");
 }
+
+export { renderImageToFramebuffer };
