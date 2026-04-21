@@ -1,4 +1,5 @@
-import { renderImageToFramebuffer } from "./fb-renderer.js";
+import { renderImageToFramebuffer } from "./lib/fb-renderer.js";
+import { getSerialNumber } from "./lib/utils.js";
 
 async function main() {
   const imagePath = "/opt/dash-rpi/images/test.jpg";
@@ -8,6 +9,9 @@ async function main() {
   } catch (err) {
     console.error(err);
   }
+
+  const deviceId = getSerialNumber();
+  console.log("Device ID:", deviceId);
 
   // mantém processo vivo (systemd)
   setInterval(() => {}, 1000 * 60 * 60);
