@@ -1,13 +1,19 @@
 [Unit]
 Description=Dash RPi Display Client
-After=network-online.target
+After=multi-user.target cloud-init.target
+Wants=multi-user.target cloud-init.target
 
 [Service]
 Type=simple
 User=root
 WorkingDirectory=/opt/dash-rpi
 EnvironmentFile=-/etc/dash-rpi/env
+
+# pequena espera para garantir que o boot terminou
+ExecStartPre=/bin/sleep 2
+
 ExecStart=/usr/local/bin/dash-rpi-start.sh
+
 Restart=always
 RestartSec=5
 
