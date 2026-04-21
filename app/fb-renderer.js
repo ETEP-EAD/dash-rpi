@@ -15,7 +15,12 @@ function getFbInfo() {
   const height = parseInt(match[2], 10);
   const bpp = parseInt(match[3], 10);
 
-  return { width, height, bpp };
+  const stride = parseInt(
+    fs.readFileSync("/sys/class/graphics/fb0/stride", "utf-8").trim(),
+    10
+  );
+
+  return { width, height, bpp, stride };
 }
 
 // converte RGBA → RGB565
@@ -40,7 +45,7 @@ function rgbaToBgr565(buffer) {
 }
 
 async function renderImageToFramebuffer(imagePath) {
-  const { width, height, bpp } = getFbInfo();
+  const { width, height, bpp, stride } = getFbInfo();
 
   console.log(`Framebuffer: ${width}x${height} (${bpp}bpp)`);
 
@@ -61,15 +66,15 @@ async function renderImageToFramebuffer(imagePath) {
     throw new Error(`Formato não suportado: ${bpp} bpp`);
   }
 
-  const stride = width * 2; // 2 bytes por pixel
+  const bytesPerPixel = bpp / 8;
 
   const fb = fs.openSync(FB_PATH, "w");
 
   for (let y = 0; y < height; y++) {
-    const start = y * width * 2;
-    const end = start + width * 2;
+    const srcStart = y * width * bytesPerPixel;
+    const srcEnd = srcStart + width * bytesPerPixel;
 
-    const line = finalBuffer.subarray(start, end);
+    const line = finalBuffer.subarray(srcStart, srcEnd);
 
     fs.writeSync(fb, line, 0, line.length, y * stride);
   }
