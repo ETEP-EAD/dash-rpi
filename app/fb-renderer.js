@@ -24,7 +24,7 @@ function getFbInfo() {
   return { width, height, bytesPerPixel, stride };
 }
 
-async function render(imagePath) {
+export async function renderImageToFramebuffer(imagePath) {
   const { width, height, bytesPerPixel, stride } = getFbInfo();
 
   console.log({ width, height, bytesPerPixel, stride });
@@ -36,7 +36,6 @@ async function render(imagePath) {
 
   const fb = fs.openSync(FB_PATH, "w");
 
-  // escreve linha por linha (CORRETO)
   for (let y = 0; y < height; y++) {
     const srcStart = y * width * bytesPerPixel;
     const srcEnd = srcStart + width * bytesPerPixel;
@@ -50,5 +49,3 @@ async function render(imagePath) {
 
   console.log("Render OK");
 }
-
-export { render };

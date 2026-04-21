@@ -46,6 +46,7 @@ sudo apt-get install -y \
   rsync \
   curl \
   ca-certificates \
+  fbset \
   nodejs \
   npm
 
