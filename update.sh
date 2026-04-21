@@ -27,7 +27,6 @@ sudo rsync -a --delete \
 
 echo "[3/7] Atualizando scripts auxiliares..."
 sudo install -m 755 "$APP_DIR/service/dash-rpi-start.sh" /usr/local/bin/dash-rpi-start.sh
-sudo install -m 755 "$APP_DIR/service/render-image.sh" /usr/local/bin/render-image.sh
 sudo install -m 755 "$REPO_DIR/update.sh" /usr/local/bin/dash-rpi-update.sh
 
 echo "[4/7] Atualizando service..."

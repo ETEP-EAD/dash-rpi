@@ -35,7 +35,6 @@ fi
 # --- remover scripts ---
 echo "[4/6] Removendo scripts auxiliares..."
 sudo rm -f /usr/local/bin/dash-rpi-start.sh
-sudo rm -f /usr/local/bin/render-image.sh
 sudo rm -f /usr/local/bin/dash-rpi-update.sh
 
 # --- confirmar remoção de dados ---

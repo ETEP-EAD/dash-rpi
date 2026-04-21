@@ -75,7 +75,6 @@ fi
 
 echo "[6/12] Instalando arquivos auxiliares..."
 sudo install -m 755 "$APP_DIR/service/dash-rpi-start.sh" /usr/local/bin/dash-rpi-start.sh
-sudo install -m 755 "$APP_DIR/service/render-image.sh" /usr/local/bin/render-image.sh
 sudo install -m 755 "$REPO_DIR/update.sh" /usr/local/bin/dash-rpi-update.sh
 
 echo "[7/12] Instalando service..."

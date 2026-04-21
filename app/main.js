@@ -1,25 +1,15 @@
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
-import path from "node:path";
-
-const execFileAsync = promisify(execFile);
+import { renderImageToFramebuffer } from "./fb-renderer.js";
 
 async function main() {
+  const imagePath = "/opt/dash-rpi/images/test.jpg";
+
   try {
-    const imagePath = path.resolve("/opt/dash-rpi/images/test.jpg");
-    const renderCmd = "/usr/local/bin/render-image.sh";
-
-    console.log("Dash-RPi test mode");
-    console.log("Rendering image:", imagePath);
-
-    await execFileAsync(renderCmd, [imagePath]);
-
-    console.log("Image rendered successfully.");
+    await renderImageToFramebuffer(imagePath);
   } catch (err) {
-    console.error("Failed to render image:", err);
+    console.error(err);
   }
 
-  // mantém o processo vivo para o systemd
+  // mantém processo vivo (systemd)
   setInterval(() => {}, 1000 * 60 * 60);
 }
 
