@@ -4,40 +4,51 @@ import { execSync } from "node:child_process";
 
 const FB_PATH = "/dev/fb0";
 
-function getFramebufferInfo() {
-  const output = execSync("fbset -s").toString();
+function getFbInfo() {
+  const output = execSync("fbset -fb /dev/fb0 -s").toString();
 
-  const match = output.match(/geometry\s+(\d+)\s+(\d+)/);
+  const geo = output.match(/geometry\s+(\d+)\s+(\d+)\s+\d+\s+\d+\s+(\d+)/);
+  const line = output.match(/rgba\s+\d+\/\d+,\d+\/\d+,\d+\/\d+,\d+\/\d+/);
 
-  if (!match) {
-    throw new Error("Não foi possível detectar resolução do framebuffer");
-  }
+  if (!geo) throw new Error("Erro lendo framebuffer");
 
-  return {
-    width: parseInt(match[1], 10),
-    height: parseInt(match[2], 10),
-  };
+  const width = parseInt(geo[1], 10);
+  const height = parseInt(geo[2], 10);
+  const bpp = parseInt(geo[3], 10);
+
+  const bytesPerPixel = bpp / 8;
+
+  // pegar stride via fbset não é confiável → calcular depois
+  const stride = width * bytesPerPixel;
+
+  return { width, height, bytesPerPixel, stride };
 }
 
-async function renderImageToFramebuffer(imagePath) {
-  const { width, height } = getFramebufferInfo();
+async function render(imagePath) {
+  const { width, height, bytesPerPixel, stride } = getFbInfo();
 
-  console.log(`Framebuffer: ${width}x${height}`);
+  console.log({ width, height, bytesPerPixel, stride });
 
-  // converte imagem para RGBA raw no tamanho da tela
-  const buffer = await sharp(imagePath)
+  const raw = await sharp(imagePath)
     .resize(width, height, { fit: "cover" })
     .raw()
     .toBuffer();
 
-  // escreve direto no framebuffer
   const fb = fs.openSync(FB_PATH, "w");
 
-  fs.writeSync(fb, buffer, 0, buffer.length, 0);
+  // escreve linha por linha (CORRETO)
+  for (let y = 0; y < height; y++) {
+    const srcStart = y * width * bytesPerPixel;
+    const srcEnd = srcStart + width * bytesPerPixel;
+
+    const line = raw.subarray(srcStart, srcEnd);
+
+    fs.writeSync(fb, line, 0, line.length, y * stride);
+  }
 
   fs.closeSync(fb);
 
-  console.log("Imagem renderizada no framebuffer.");
+  console.log("Render OK");
 }
 
-export { renderImageToFramebuffer };
+export { render };
