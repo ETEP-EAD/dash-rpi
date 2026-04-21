@@ -29,5 +29,9 @@ export function initSocket() {
     console.log("⚠️ Erro de conexão:", err.message);
   });
 
+  socket.on("show", (data) => {
+    console.log("🔔 Show event received:", data);
+  });
+
   return socket;
 }
