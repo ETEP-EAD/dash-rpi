@@ -7,7 +7,7 @@ import { getFbInfo, renderImageToFramebuffer, renderBufferToFramebuffer } from "
 const DEVICE_ID = getSerialNumber();
 
 export function initSocket() {
-  const socket = io("http://192.168.1.102:3000", {
+  const socket = io("https://dash.4growth.co", {
     transports: ["websocket"], // força websocket (melhor pro embedded)
     reconnection: true,
     reconnectionAttempts: Infinity,
