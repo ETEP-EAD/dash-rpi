@@ -50,9 +50,9 @@ export function initSocket() {
   socket.on("show_buffer", async (data) => {
     console.log("🖼️ buffer recebido");
 
-    const buffer = Buffer.from(data.image, "base64");
+    const buffer = data.image;
 
-    await renderBufferToFramebuffer(buffer);
+    // await renderBufferToFramebuffer(buffer);
   });
 
   return socket;
