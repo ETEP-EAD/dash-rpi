@@ -49,7 +49,7 @@ async function renderImageToFramebuffer(imagePath) {
   console.log(`Framebuffer: ${width}x${height} (${bpp}bpp)`);
 
   const rgba = await sharp(imagePath)
-    .resize(width, height, { fit: "cover" })
+    .resize(width, height, { fit: "contain" })
     .ensureAlpha()
     .raw()
     .toBuffer();
