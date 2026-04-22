@@ -52,7 +52,7 @@ export function initSocket() {
 
     const buffer = data.image;
 
-    // await renderBufferToFramebuffer(buffer);
+    await renderBufferToFramebuffer(buffer);
   });
 
   return socket;
