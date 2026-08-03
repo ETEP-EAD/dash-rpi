@@ -54,7 +54,7 @@ echo "[2/11] Criando diretórios..."
 sudo mkdir -p "$APP_DIR" "$ENV_DIR" "$DATA_DIR" "$IMAGE_DIR" "$LOG_DIR"
 
 echo "[3/11] Registrando caminho do repositório de origem..."
-echo "SOURCE_REPO_DIR=$REPO_DIR" | sudo tee "$SOURCE_FILE" >/dev/null
+printf 'SOURCE_REPO_DIR=%q\n' "$REPO_DIR" | sudo tee "$SOURCE_FILE" >/dev/null
 
 echo "[4/11] Copiando aplicação para $APP_DIR ..."
 sudo rsync -a --delete \

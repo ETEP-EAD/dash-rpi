@@ -1,13 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SOURCE_FILE="/etc/dash-rpi/source.conf"
+REPO_DIR="$SCRIPT_DIR"
 APP_DIR="/opt/dash-rpi"
 SERVICE_NAME="dash-rpi.service"
 SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}"
 
+if [ ! -d "$REPO_DIR/.git" ] && [ -f "$SOURCE_FILE" ]; then
+  # shellcheck disable=SC1090
+  source "$SOURCE_FILE"
+  REPO_DIR="${SOURCE_REPO_DIR:-}"
+fi
+
 if [ ! -d "$REPO_DIR/.git" ]; then
-  echo "Erro: $REPO_DIR não parece ser um repositório git."
+  echo "Erro: o repositório de origem não foi encontrado em '$REPO_DIR'."
+  echo "Verifique a configuração em $SOURCE_FILE."
   exit 1
 fi
 

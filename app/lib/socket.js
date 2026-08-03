@@ -5,9 +5,10 @@ import { getSerialNumber } from "./utils.js";
 import { getFbInfo, renderImageToFramebuffer, renderBufferToFramebuffer } from "./fb-renderer.js";
 
 const DEVICE_ID = getSerialNumber();
+const BACKEND_WS_URL = process.env.BACKEND_WS_URL || "https://dash.4growth.co";
 
 export function initSocket() {
-  const socket = io("https://dash.4growth.co", {
+  const socket = io(BACKEND_WS_URL, {
     transports: ["websocket"], // força websocket (melhor pro embedded)
     reconnection: true,
     reconnectionAttempts: Infinity,
