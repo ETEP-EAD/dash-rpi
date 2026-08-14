@@ -9,10 +9,12 @@ const BACKEND_WS_URL = process.env.BACKEND_WS_URL || "https://dash.4growth.co";
 
 export function initSocket() {
   const socket = io(BACKEND_WS_URL, {
-    transports: ["websocket"], // força websocket (melhor pro embedded)
+    transports: ["websocket"],
     reconnection: true,
     reconnectionAttempts: Infinity,
-    reconnectionDelay: 2000
+    reconnectionDelay: 2000,
+    // força o path padrão (só pra garantir)
+    path: "/socket.io/"
   });
 
   socket.on("connect", () => {
@@ -33,6 +35,7 @@ export function initSocket() {
 
   socket.on("connect_error", (err) => {
     console.log("⚠️ Erro de conexão:", err.message);
+    console.log("Detalhes:", err);
   });
 
   socket.on("show", (data) => {
