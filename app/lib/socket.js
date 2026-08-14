@@ -9,12 +9,13 @@ const BACKEND_WS_URL = process.env.BACKEND_WS_URL || "https://dash.4growth.co";
 
 export function initSocket() {
   const socket = io(BACKEND_WS_URL, {
-    transports: ["websocket"],
+    transports: ["websocket", "polling"], // deixa o fallback
     reconnection: true,
     reconnectionAttempts: Infinity,
     reconnectionDelay: 2000,
-    // força o path padrão (só pra garantir)
-    path: "/socket.io/"
+    reconnectionDelayMax: 10000,
+    timeout: 20000,          // aumenta o timeout do handshake
+    forceNew: true
   });
 
   socket.on("connect", () => {
